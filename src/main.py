@@ -1,7 +1,7 @@
 # src/main.py
 
 import argparse
-from src.handler import get_git_diff, DocGenerator
+from handler import get_git_diff, DocGenerator
 
 def main():
     parser = argparse.ArgumentParser()
