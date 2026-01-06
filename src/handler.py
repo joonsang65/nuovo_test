@@ -3,7 +3,7 @@
 import subprocess
 import sys
 import os
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
@@ -14,6 +14,7 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
         files_cmd = ["git", "diff", "--name-only", base_ref, head_ref]
         changed_files = subprocess.check_output(files_cmd).decode("utf-8").strip().split('\n')
         print(f'변경 파일 : {changed_files}')
+        
         diff_cmd = ["git", "diff", base_ref, head_ref]
         diff_output = subprocess.check_output(diff_cmd).decode("utf-8")
         
@@ -29,15 +30,21 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
 class DocGenerator:
     def __init__(self):
         load_dotenv()
-        self.api_key = os.getenv("OPENAI_API_KEY")
+        # [변경] 환경변수 이름을 GEMINI_API_KEY로 변경
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        
         if not self.api_key and os.getenv("MOCK_MODE") != "true":
-            raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다.")
+            raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다.")
+        
         if self.api_key:
-            self.client = OpenAI(api_key=self.api_key)
+            # [변경] Gemini 설정
+            genai.configure(api_key=self.api_key)
 
-    def generate_docs(self, diff_content: str, model: str = "gpt-4o") -> str:
+    def generate_docs(self, diff_content: str, model: str = "gemini-1.5-flash") -> str:
+        # [변경] 기본 모델을 gemini-1.5-flash로 변경 (속도/비용 효율적)
+        
         if os.getenv("MOCK_MODE") == "true":
-            return '[MOCK] 자동 생성된 문서 예시'
+            return '[MOCK] 자동 생성된 문서 예시 (Gemini)'
 
         """
         Diff 내용을 바탕으로 문서를 생성합니다.
@@ -51,14 +58,19 @@ class DocGenerator:
             3. **기술적 영향**: 코드 구조나 성능에 미칠 영향.
             """
 
-            response = self.client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"}
-                ],
-                temperature=0.3
-            )    
-            return response.choices[0].message.content
+            # [변경] Gemini 모델 초기화 (시스템 프롬프트 설정)
+            generative_model = genai.GenerativeModel(
+                model_name=model,
+                system_instruction=system_prompt
+            )
+
+            # [변경] 콘텐츠 생성 호출
+            response = generative_model.generate_content(
+                f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"
+            )
+            
+            # [변경] 응답 텍스트 추출 방식 변경
+            return response.text
+            
         except Exception as e:
             return f"API 호출 중 에러 발생 \n{str(e)}"
