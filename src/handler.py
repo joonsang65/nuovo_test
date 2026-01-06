@@ -38,7 +38,7 @@ class DocGenerator:
         if self.api_key:
             genai.configure(api_key=self.api_key)
 
-    def generate_docs(self, diff_content: str, model: str = "gemini-1.5-flash") -> str:
+    def generate_docs(self, diff_content: str, model: str = "gemini-2.5-flash") -> str:
         
         if os.getenv("MOCK_MODE") == "true":
             return '[MOCK] 자동 생성된 문서 예시 (Gemini)'
