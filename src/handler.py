@@ -1,7 +1,10 @@
+# src/handler.py
+
 import subprocess
 import sys
 import os
 from openai import OpenAI
+from dotenv import load_dotenv
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
     """
@@ -10,7 +13,7 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
     try:
         files_cmd = ["git", "diff", "--name-only", base_ref, head_ref]
         changed_files = subprocess.check_output(files_cmd).decode("utf-8").strip().split('\n')
-        
+        print(f'변경 파일 : {changed_files}')
         diff_cmd = ["git", "diff", base_ref, head_ref]
         diff_output = subprocess.check_output(diff_cmd).decode("utf-8")
         
@@ -25,6 +28,7 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
 
 class DocGenerator:
     def __init__(self):
+        load_dotenv()
         self.api_key = os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다.")

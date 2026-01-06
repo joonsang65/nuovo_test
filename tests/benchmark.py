@@ -1,6 +1,13 @@
+# src/benchmark.py
+
 import time
-from handler import DocGenerator
+import os
 import tiktoken
+from dotenv import load_dotenv
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from src.handler import DocGenerator
 
 def run_benchmark():
     sample_diff = """
