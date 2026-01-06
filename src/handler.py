@@ -4,6 +4,7 @@ import subprocess
 import sys
 import os
 from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
@@ -36,12 +37,17 @@ class DocGenerator:
             raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다.")
         
         if self.api_key:
-            genai.configure(api_key=self.api_key)
+            self.client = genai.Client(api_key=self.api_key)
+        else:
+            self.client = None # Handle mock mode or missing API key without a client
 
     def generate_docs(self, diff_content: str, model: str = "gemini-2.5-flash") -> str:
         
         if os.getenv("MOCK_MODE") == "true":
             return '[MOCK] 자동 생성된 문서 예시 (Gemini)'
+        
+        if not self.client:
+            raise ValueError("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다.")
 
         """
         Diff 내용을 바탕으로 문서를 생성합니다.
@@ -55,15 +61,13 @@ class DocGenerator:
             3. **기술적 영향**: 코드 구조나 성능에 미칠 영향.
             """
 
-            # [변경] Gemini 모델 초기화 (시스템 프롬프트 설정)
-            generative_model = genai.GenerativeModel(
-                model_name=model,
-                system_instruction=system_prompt
-            )
-
             # [변경] 콘텐츠 생성 호출
-            response = generative_model.generate_content(
-                f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"
+            response = self.client.models.generate_content(
+                model=model,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt
+                ),
+                contents=f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"
             )
             
             # [변경] 응답 텍스트 추출 방식 변경
@@ -71,3 +75,23 @@ class DocGenerator:
             
         except Exception as e:
             return f"API 호출 중 에러 발생 \n{str(e)}"
+
+    def count_tokens(self, content: str, model: str = "gemini-2.5-flash") -> int:
+        """
+        입력된 텍스트의 토큰 수를 계산합니다.
+        """
+        if os.getenv("MOCK_MODE") == "true":
+            return len(content.split()) # Mock implementation
+
+        if not self.client:
+            print("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다. 토큰 계산을 건너뜝니다.")
+            return 0
+        try:
+            response = self.client.models.count_tokens(
+                model=model,
+                contents=content
+            )
+            return response.total_tokens
+        except Exception as e:
+            print(f"토큰 계산 중 에러 발생: {e}")
+            return 0

@@ -4,7 +4,6 @@ import time
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import tiktoken
 from src.handler import DocGenerator
 
 def run_benchmark():
@@ -20,21 +19,21 @@ def run_benchmark():
     
     print("=== 벤치마크 시작 ===")
     
+    generator = DocGenerator()
+
     # 토큰 계산
-    enc = tiktoken.encoding_for_model("cl100k_base")
-    input_tokens = len(enc.encode(sample_diff))
+    input_tokens = generator.count_tokens(sample_diff)
     print(f"[*] 입력 토큰 수: {input_tokens}")
 
     # 실행 시간 측정
     start_time = time.time()
     
-    generator = DocGenerator()
     result = generator.generate_docs(sample_diff)
     
     end_time = time.time()
     elapsed_time = end_time - start_time
     
-    output_tokens = len(enc.encode(result))
+    output_tokens = generator.count_tokens(result)
     
     print(f"[*] 소요 시간: {elapsed_time:.2f}초")
     print(f"[*] 출력 토큰: {result}")
