@@ -22,10 +22,6 @@ def count_tokens_safe(generator, text):
 
 def run_benchmark():
     print("=== 벤치마크 시작 ===")
-    print("-" * 80)
-    print(f"{'ID':<4} | {'소요시간':<8} | {'토큰수':<6} | {'실제 답변 (Ground Truth)':<30} | {'모델 답변 (Model Output)'}")
-    print("-" * 80)
-
     try:
         generator = DocGenerator()
     except Exception as e:
@@ -50,17 +46,12 @@ def run_benchmark():
         # 토큰 수 계산
         output_tokens = count_tokens_safe(generator, model_output)
         
-        clean_output = model_output.replace('\n', ' ').strip()[:50] + "..." # 너무 길면 자름
-        
-        print(f"[{data['id']}] {elapsed_time:.2f}s / {output_tokens} tokens")
-        print(f" ㄴ 모델: {clean_output}")
-        print(f" ㄴ 정답: {ground_truth}")
+        print(f"[{data['id']}] {elapsed_time:.2f}s / {output_tokens} tokens\n")
+        print(f"[모델]\n {model_output}\n")
+        print(f"[정답]\n {ground_truth}")
         print("-" * 40)
 
     print("=== 벤치마크 종료 ===")
 
 if __name__ == "__main__":
-    if TEST_DATASET[0] == ...:
-        print("스크립트 내에 TEST_DATASET을 채워주세요!")
-    else:
-        run_benchmark()
+    run_benchmark()
