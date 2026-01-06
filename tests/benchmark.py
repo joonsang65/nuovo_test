@@ -2,11 +2,9 @@
 
 import time
 import os
-import tiktoken
-from dotenv import load_dotenv
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
+import tiktoken
 from src.handler import DocGenerator
 
 def run_benchmark():
@@ -39,6 +37,7 @@ def run_benchmark():
     output_tokens = len(enc.encode(result))
     
     print(f"[*] 소요 시간: {elapsed_time:.2f}초")
+    print(f"[*] 출력 토큰: {result}")
     print(f"[*] 출력 토큰 수: {output_tokens}")
     print("=== 벤치마크 종료 ===")
 
