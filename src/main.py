@@ -16,7 +16,7 @@ def main():
         print("[!] Diff가 너무 깁니다. 앞부분만 사용합니다.")
         diff_content = diff_content[:10000]
 
-    print("[*] 문서 생성 중 (OpenAI)...")
+    print("[*] 문서 생성 중 (GEMINI)...")
     generator = DocGenerator()
     docs = generator.generate_docs(diff_content)
 
