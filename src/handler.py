@@ -33,19 +33,16 @@ class DocGenerator:
         load_dotenv()
         self.api_key = os.getenv("GEMINI_API_KEY")
         
-        if not self.api_key and os.getenv("MOCK_MODE") != "true":
+        if not self.api_key:
             raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다.")
         
         if self.api_key:
             self.client = genai.Client(api_key=self.api_key)
         else:
-            self.client = None # Handle mock mode or missing API key without a client
+            self.client = None
 
     def generate_docs(self, diff_content: str, model: str = "gemini-2.5-flash") -> str:
-        
-        if os.getenv("MOCK_MODE") == "true":
-            return '[MOCK] 자동 생성된 문서 예시 (Gemini)'
-        
+                
         if not self.client:
             raise ValueError("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다.")
 
@@ -61,7 +58,6 @@ class DocGenerator:
             3. **기술적 영향**: 코드 구조나 성능에 미칠 영향.
             """
 
-            # [변경] 콘텐츠 생성 호출
             response = self.client.models.generate_content(
                 model=model,
                 config=types.GenerateContentConfig(
@@ -70,7 +66,6 @@ class DocGenerator:
                 contents=f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"
             )
             
-            # [변경] 응답 텍스트 추출 방식 변경
             return response.text
             
         except Exception as e:
@@ -80,9 +75,6 @@ class DocGenerator:
         """
         입력된 텍스트의 토큰 수를 계산합니다.
         """
-        if os.getenv("MOCK_MODE") == "true":
-            return len(content.split()) # Mock implementation
-
         if not self.client:
             print("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다. 토큰 계산을 건너뜝니다.")
             return 0
