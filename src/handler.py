@@ -3,7 +3,7 @@
 import subprocess
 import sys
 import os
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
