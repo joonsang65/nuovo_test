@@ -26,7 +26,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv pip install -r requirements.txt
+          pip install -r requirements.txt
 
       - name: Run Benchmark
         env:
@@ -52,3 +52,4 @@ jobs:
           git add generated_docs.md
           git commit -m "docs: Update documentation for PR #${{ github.event.pull_request.number }}"
           git push
+          
