@@ -26,7 +26,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv pip install -r requirements.txt
+          pip install -r requirements.txt
 
       - name: Run Benchmark
         env:
