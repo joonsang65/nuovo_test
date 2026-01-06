@@ -21,7 +21,7 @@ def run_benchmark():
     print("=== 벤치마크 시작 ===")
     
     # 토큰 계산
-    enc = tiktoken.encoding_for_model("gpt-4o")
+    enc = tiktoken.encoding_for_model("gemini-2.5-flash")
     input_tokens = len(enc.encode(sample_diff))
     print(f"[*] 입력 토큰 수: {input_tokens}")
 
