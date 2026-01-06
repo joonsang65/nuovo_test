@@ -1,0 +1,54 @@
+name: Auto Documentation on Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  generate-docs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          uv pip install -r requirements.txt
+
+      - name: Run Benchmark
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python tests/benchmark.py
+
+      - name: Generate Documentation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python src/main.py --base ${{ github.event.pull_request.base.sha }} --head ${{ github.event.pull_request.head.sha }}
+
+      - name: Upload Docs as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-generated-docs
+          path: generated_docs.md
+
+      - name: Commit and Push Docs
+        run: |
+          git config --global user.name 'Docs Bot'
+          git config --global user.email 'bot@noreply.github.com'
+          git add generated_docs.md
+          git commit -m "docs: Update documentation for PR #${{ github.event.pull_request.number }}"
+          git push
