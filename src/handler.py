@@ -30,18 +30,15 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
 class DocGenerator:
     def __init__(self):
         load_dotenv()
-        # [변경] 환경변수 이름을 GEMINI_API_KEY로 변경
         self.api_key = os.getenv("GEMINI_API_KEY")
         
         if not self.api_key and os.getenv("MOCK_MODE") != "true":
             raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다.")
         
         if self.api_key:
-            # [변경] Gemini 설정
             genai.configure(api_key=self.api_key)
 
     def generate_docs(self, diff_content: str, model: str = "gemini-1.5-flash") -> str:
-        # [변경] 기본 모델을 gemini-1.5-flash로 변경 (속도/비용 효율적)
         
         if os.getenv("MOCK_MODE") == "true":
             return '[MOCK] 자동 생성된 문서 예시 (Gemini)'
