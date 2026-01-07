@@ -8,9 +8,6 @@ from google.genai import types
 from dotenv import load_dotenv
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
-    """
-    두 커밋(또는 Ref) 사이의 차이점을 추출합니다.
-    """
     try:
         files_cmd = ["git", "diff", "--name-only", base_ref, head_ref]
         changed_files = subprocess.check_output(files_cmd).decode("utf-8").strip().split('\n')
@@ -20,7 +17,7 @@ def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
         diff_output = subprocess.check_output(diff_cmd).decode("utf-8")
         
         if not diff_output:
-            return "변경 사항이 없습니다."
+            return "변경 사항 없음"
             
         return diff_output
 
@@ -34,21 +31,14 @@ class DocGenerator:
         self.api_key = os.getenv("GEMINI_API_KEY")
         
         if not self.api_key:
-            raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다.")
+            raise ValueError("GEMINI_API_KEY 미설정")
         
-        if self.api_key:
-            self.client = genai.Client(api_key=self.api_key)
-        else:
-            self.client = None
+        self.client = genai.Client(api_key=self.api_key)
 
-    def generate_docs(self, diff_content: str, model: str = "gemini-2.5-flash") -> str:
-                
+    def generate_docs(self, diff_content: str, model: str = "gemini-2.5-flash") -> dict:
         if not self.client:
-            raise ValueError("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다.")
+            raise ValueError("API 클라이언트가 초기화 실패")
 
-        """
-        Diff 내용을 바탕으로 문서를 생성합니다.
-        """
         try:
             system_prompt = """
             당신은 수석 테크니컬 라이터입니다. 
@@ -65,25 +55,20 @@ class DocGenerator:
                 ),
                 contents=f"다음 변경 사항을 문서화해줘:\n\n{diff_content}"
             )
+        
+            usage = response.usage_metadata
             
-            return response.text
+            return {
+                "text": response.text,
+                "usage": {
+                    "prompt_tokens": usage.prompt_token_count if usage else 0,
+                    "output_tokens": usage.candidates_token_count if usage else 0,
+                    "total_tokens": usage.total_token_count if usage else 0
+                },
+            }
             
         except Exception as e:
-            return f"API 호출 중 에러 발생 \n{str(e)}"
-
-    def count_tokens(self, content: str, model: str = "gemini-2.5-flash") -> int:
-        """
-        입력된 텍스트의 토큰 수를 계산합니다.
-        """
-        if not self.client:
-            print("GEMINI_API_KEY가 설정되지 않았거나 API 클라이언트가 초기화되지 않았습니다. 토큰 계산을 건너뜝니다.")
-            return 0
-        try:
-            response = self.client.models.count_tokens(
-                model=model,
-                contents=content
-            )
-            return response.total_tokens
-        except Exception as e:
-            print(f"토큰 계산 중 에러 발생: {e}")
-            return 0
+            return {
+                "text": f"API 호출 중 에러 발생 \n{str(e)}",
+                "usage": {"prompt_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+            }

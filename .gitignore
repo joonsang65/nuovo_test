@@ -1,6 +1,4 @@
 .venv/
-venv/
-env/
 __pycache__/
 *.pyc
 .env
@@ -8,6 +6,5 @@ check_models.py
 output.txt
 tests/__pycache__/
 tests/*.log
-tests/test_result.txt
 tests/dataset.py
 tests/output
