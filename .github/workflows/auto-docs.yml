@@ -1,50 +1,66 @@
 name: Auto Documentation on Merge
 
+# 조건 : main branch에 PR이 닫히면 실행함
 on:
   pull_request:
     types: [closed]
     branches:
       - main
 
+# 실행 task
 jobs:
   generate-docs:
+    # PR이 닫힌 게 merge 되어서 닫힌 것만 실행함
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    # 권한 부여
     permissions:
       contents: write
 
     steps:
+      # 코드 가져오기
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
+          # history까지 가져오기 위해 depth : 0으로 설정
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'  # 설치 속도 높이기 위함
 
+      # 의존성 설치    
       - name: Install Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # 변경사항 docs 생성
       - name: Generate Documentation
         env:
+          # secrets에 넣어둔 api 키 주입
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python src/main.py --base ${{ github.event.pull_request.base.sha }} --head ${{ github.event.pull_request.head.sha }}
 
+      # 디버깅용 아티팩트 저장
       - name: Upload Docs as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: auto-generated-docs
           path: generated_docs.md
 
+      # 레포에 docs 저장 (변경 사항 있을 때만 commit)
       - name: Commit and Push Docs
         run: |
           git config --global user.name 'Docs Bot'
           git config --global user.email 'bot@noreply.github.com'
           git add generated_docs.md
-          git commit -m "docs: Update documentation for PR #${{ github.event.pull_request.number }}"
-          git push
-          
+          if ! git diff --staged --quiet; then
+            git commit -m "docs: Update documentation for PR #${{ github.event.pull_request.number }}"
+            git push
+          else
+            echo "변경 사항 없음"
+          fi
