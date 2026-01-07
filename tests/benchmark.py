@@ -8,9 +8,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from src.handler import DocGenerator
 from dataset import TEST_DATASET
 
-def count_tokens_safe(generator, text):
-    return generator.count_tokens(text)
-
 def run_benchmark():
     print("=== 벤치마크 시작 ===")
     try:
@@ -19,9 +16,14 @@ def run_benchmark():
         print(f"Generator 초기화 실패: {e}")
         return
 
+    # output 폴더 없을 경우 대비
     output_dir = os.path.join(os.path.dirname(__file__), 'output')
+    os.makedirs(output_dir, exist_ok=True)
+
     total_time = 0.0
-    total_tokens = 0
+    total_output_tokens = 0
+    total_api_tokens = 0
+    
     test_count = len(TEST_DATASET)
     details_log = []
 
@@ -31,44 +33,46 @@ def run_benchmark():
         case_id = data['id']
         
         # 실행 시간 측정
-        start_time = time.time()
-        
-        try:
-            model_output = generator.generate_docs(sample_diff)
-        except Exception as e:
-            model_output = f"Error: {e}"
-
+        start_time = time.time()        
+        result = generator.generate_docs(sample_diff)
         end_time = time.time()
         elapsed_time = end_time - start_time
         
-        # 토큰 수 계산
-        output_tokens = count_tokens_safe(generator, model_output)
+        model_output = result["text"]
+        usage = result["usage"]        
+        output_tokens = usage["output_tokens"]
+        total_tokens = usage["total_tokens"]
         
         # 통계 누적
         total_time += elapsed_time
-        total_tokens += output_tokens
+        total_output_tokens += output_tokens
+        total_api_tokens += total_tokens
 
         log_entry = (
-            f"[{case_id}] time : {elapsed_time:.2f}s / token : {output_tokens}\n"
+            f"[{case_id}] time : {elapsed_time:.2f}s "
+            f"/ output token : {output_tokens} (total charged: {total_tokens})\n"
             f"[model]\n{model_output}\n\n"
             f"[ground truth]\n{ground_truth}\n"
             f"{'-' * 40}"
         )
         
-        details_log.append(log_entry)
-        print(f"[{case_id}] time : {elapsed_time:.2f}s / token : {output_tokens}\n")
+        details_log.append(log_entry)        
+        print(f"[{case_id}] time : {elapsed_time:.2f}s / output token : {output_tokens}")
 
     # Summary
     avg_time = total_time / test_count if test_count > 0 else 0
-    avg_tokens = total_tokens / test_count if test_count > 0 else 0
+    avg_output_tokens = total_output_tokens / test_count if test_count > 0 else 0
+    avg_total_tokens = total_api_tokens / test_count if test_count > 0 else 0
 
     summary_text = (
         "====== summary =====\n"
         f"total time : {total_time:.2f}s / avg time : {avg_time:.2f}s\n"
-        f"total token : {total_tokens} / avg token : {avg_tokens:.1f}\n\n"
+        f"avg output token : {avg_output_tokens:.1f} (answer length)\n"
+        f"avg total token  : {avg_total_tokens:.1f} (billed amount)\n\n"
         "===== details =====\n"
     )
 
+    # 파일 저장
     current_time_str = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"output_{current_time_str}.txt"
     file_path = os.path.join(output_dir, filename)
