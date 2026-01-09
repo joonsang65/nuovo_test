@@ -3,8 +3,7 @@ __pycache__/
 *.pyc
 .env
 check_models.py
-output.txt
 tests/__pycache__/
 tests/*.log
-tests/dataset.py
+tests/dataset_*.py
 tests/output
