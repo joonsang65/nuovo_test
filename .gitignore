@@ -6,4 +6,4 @@ check_models.py
 tests/__pycache__/
 tests/*.log
 tests/test*/dataset_*.py
-tests/output*
+tests/test*/output*

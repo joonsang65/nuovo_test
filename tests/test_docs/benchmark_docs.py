@@ -8,10 +8,10 @@ import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 from src.handler import DocGenerator
-import dataset_easy
-import dataset_normal
+import dataset_easy_docs as dataset_easy_docs
+import dataset_normal_docs as dataset_normal_docs
 load_dotenv()
 
 # 불필요하게 acc 하락 방지용 stop word 설정
@@ -56,7 +56,7 @@ def compute_max_similarity(target_vec, comparison_vectors):
     
     return np.max(similarities)
 
-def calculate_semantic_recall(client, ground_truth, model_output, threshold=0.75):
+def calculate_semantic_recall(client, ground_truth, model_output, threshold=0.85):
     gt_tokens = tokenize(ground_truth)
     out_tokens = tokenize(model_output)
     
@@ -84,7 +84,7 @@ def calculate_semantic_recall(client, ground_truth, model_output, threshold=0.75
     semantic_matches = set()
     missing_tokens = set()
 
-    # 유사도 판단 - 0.75 이상일 경우에만 추가
+    # 유사도 판단 - 0.85 이상일 경우에만 추가
     for gt_word in remaining_gt_tokens:
         gt_vec = gt_embeddings.get(gt_word)
         max_sim = compute_max_similarity(gt_vec, out_vectors)
@@ -187,8 +187,8 @@ def run_benchmark(test_dataset):
 
 if __name__ == "__main__":
     DATASET_MAP = {
-    "easy": dataset_easy.TEST_DATASET,
-    "normal": dataset_normal.TEST_DATASET
+    "easy": dataset_easy_docs.TEST_DATASET,
+    "normal": dataset_normal_docs.TEST_DATASET
     }
     while True:
         mode = input("Choose mode [ easy / normal ] : ").lower()
