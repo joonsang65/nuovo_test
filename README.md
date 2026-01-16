@@ -1,70 +1,61 @@
 # New Project
 
-This project leverages AI, specifically Google Gemini, to automate the process of updating project documentation and `README.md` files based on recent Git changes. It also incorporates an advanced benchmarking system designed to evaluate the outputs of AI models.
+이 프로젝트는 AI, 특히 Google Gemini를 활용하여 최근 Git 변경사항을 기반으로 프로젝트 문서와 `README.md` 파일을 자동으로 업데이트합니다. 또한 AI 모델의 출력 결과를 평가하기 위한 고급 벤치마킹 시스템도 포함하고 있어요.
 
-## Features
+## 주요 기능 (Features)
 
-*   **Automated README Updates**: Automatically analyzes Git diffs and updates the `README.md` file using Gemini, ensuring your project's primary documentation is always current with the latest development.
-*   **Semantic Recall Benchmarking System**: An advanced system for evaluating AI model outputs, now featuring:
-    *   **Semantic Recall**: A new metric that measures the semantic similarity between model-generated content and ground truth by utilizing word embeddings and cosine similarity.
-    *   **Improved Data Management**: Enhanced flexibility to load and manage various dataset files (e.g., `dataset_easy.py`, `dataset_normal.py`) for comprehensive testing.
-    *   **Enhanced Logging**: Provides detailed benchmark results, including Semantic Recall scores, execution time, and lists of missing tokens for better insights.
-*   **Flexible CI/CD Integration**: The documentation and README update workflow is seamlessly integrated into GitHub Actions, supporting:
-    *   Automatic execution upon Pull Request merges to the `main` branch.
-    *   Manual triggering via the GitHub Actions tab for on-demand updates whenever necessary.
+*   **자동 README 업데이트**: Git Diff를 자동으로 분석하고 Gemini를 활용하여 `README.md` 파일을 최신 개발 내용에 맞춰 업데이트해 줍니다. 덕분에 프로젝트 문서가 항상 최신 상태를 유지할 수 있어요.
+*   **의미론적 리콜 벤치마킹 시스템**: AI 모델의 결과물을 평가하기 위한 고급 시스템으로, 다음 기능들을 포함하고 있습니다:
+    *   **의미론적 리콜 (Semantic Recall)**: 단어 임베딩(word embeddings)과 코사인 유사도(cosine similarity)를 활용하여 모델이 생성한 내용과 실제 정답(ground truth) 간의 의미적 유사도를 측정하는 새로운 평가 지표입니다.
+    *   **향상된 데이터 관리**: 다양한 데이터셋 파일(예: `dataset_easy.py`, `dataset_normal.py`)을 더 유연하게 로드하고 관리할 수 있어 포괄적인 테스트가 가능해졌어요.
+    *   **상세 로깅**: 의미론적 리콜 점수, 실행 시간, 누락된 토큰 목록 등 상세한 벤치마크 결과를 제공하여 더 깊이 있는 분석을 돕습니다.
+*   **유연한 CI/CD 통합**: 문서 및 README 업데이트 워크플로우는 GitHub Actions에 완벽하게 통합되어 다음을 지원합니다:
+    *   `main` 브랜치로 Pull Request가 병합될 때마다 자동으로 실행돼요.
+    *   필요할 때마다 GitHub Actions 탭에서 수동으로 워크플로우를 실행할 수도 있습니다.
 
-## Setup
+## 설치 방법 (Setup)
 
-To get started with this project, please follow these setup instructions:
+프로젝트를 시작하려면 다음 설치 지침을 따라주세요.
 
-1.  **Python 3.11+**: Ensure you have a compatible Python version installed.
-2.  **Install Dependencies**: Install all required Python packages:
+1.  **Python 3.11+**: 호환 가능한 Python 버전이 설치되어 있는지 확인해 주세요.
+2.  **의존성 설치**: 필요한 모든 Python 패키지를 설치합니다:
     ```bash
     pip install -r requirements.txt
     ```
-    *Note: `numpy` is now a dependency, specifically for the semantic recall feature of the benchmarking system.*
-3.  **Gemini API Key**: A Google Gemini API key is required.
-    *   **For Local Development**: Create a `.env` file in the project's root directory and add your key:
+    *참고: `numpy`는 벤치마킹 시스템의 의미론적 리콜(Semantic Recall) 기능에 필요한 새로운 의존성입니다.*
+3.  **Gemini API 키**: Google Gemini API 키가 필요합니다.
+    *   **로컬 개발용**: 프로젝트 루트 디렉토리에 `.env` 파일을 만들고 키를 추가하세요:
         ```
         GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
         ```
-    *   **For GitHub Actions**: Add `GEMINI_API_KEY` to your repository's secrets.
+    *   **GitHub Actions용**: 저장소의 Secrets에 `GEMINI_API_KEY`를 추가해 주세요.
 
-## Usage
+## 사용 방법 (Usage)
 
-### Updating README & Documentation
+### README 및 문서 업데이트
 
-The project's `README.md` and documentation are updated automatically through GitHub Actions:
+프로젝트의 `README.md`와 문서는 GitHub Actions를 통해 자동으로 업데이트됩니다.
 
-*   **Automatic Updates on PR Merge**: Whenever a Pull Request is merged into the `main` branch, the `auto-docs.yml` workflow will automatically run, analyze the Git diff, and update the `README.md` file accordingly.
-*   **Manual Trigger**: You can manually trigger the workflow:
-    1.  Navigate to the "Actions" tab in your GitHub repository.
-    2.  Select the "Auto Docs" workflow from the left sidebar.
-    3.  Click the "Run workflow" button, typically choosing the `main` branch, to initiate an on-demand update.
+*   **PR 병합 시 자동 업데이트**: Pull Request가 `main` 브랜치로 병합될 때마다 `auto-docs.yml` 워크플로우가 자동으로 실행되어 Git Diff를 분석하고 `README.md` 파일을 업데이트합니다.
+*   **수동 실행**: 다음 단계를 통해 워크플로우를 수동으로 실행할 수 있습니다:
+    1.  GitHub 저장소의 "Actions" 탭으로 이동합니다.
+    2.  왼쪽 사이드바에서 "Auto Docs" 워크플로우를 선택합니다.
+    3.  일반적으로 `main` 브랜치를 선택한 후 "Run workflow" 버튼을 클릭하여 즉시 업데이트를 시작합니다.
 
-### Running Benchmarks
+### 벤치마크 실행
 
-While the `src/main.py` script is now primarily focused on `README.md` updates, the benchmark tests themselves are located in `tests/test_docs/benchmark.py`. These can be executed directly for evaluation purposes.
+`src/main.py` 스크립트는 이제 주로 `README.md` 업데이트에 초점을 맞추고 있지만, 벤치마크 테스트 자체는 `tests/test_docs/benchmark.py`에 있습니다. 평가 목적으로 이 파일을 직접 실행할 수 있어요.
 
-## Project Structure
+## 프로젝트 구조 (Project Structure)
 
-*   `src/`: Contains the core logic for the project.
-    *   `src/handler.py`: Includes `DocGenerator` (for general documentation generation) and the newly added `ReadmeGenerator` class.
-    *   `src/main.py`: The main entry point for the application, currently focused on processing Git diffs to update `README.md`.
-*   `tests/test_docs/`: This directory now houses the benchmark tests, including the updated `benchmark.py`.
+*   `src/`: 프로젝트의 핵심 로직을 담고 있습니다.
+    *   `src/handler.py`: `DocGenerator`(일반 문서 생성을 위한 클래스)와 새로 추가된 `ReadmeGenerator` 클래스를 포함합니다.
+    *   `src/main.py`: 애플리케이션의 주요 진입점으로, 현재 Git Diff를 처리하여 `README.md`를 업데이트하는 데 중점을 둡니다.
+*   `tests/test_docs/`: 이제 벤치마크 테스트들이 이 디렉토리에 있으며, 업데이트된 `benchmark.py`가 포함되어 있습니다.
 
-## Recent Updates
+## 최근 업데이트 (ChangeLog)
 
-*   **Automated README Generation**: A new `ReadmeGenerator` class has been implemented and integrated into `src/main.py` to automatically update `README.md` based on Git diffs.
-    *   The `DocGenerator`'s system prompt has been updated to explicitly request documentation output in **Korean**.
-*   **GitHub Actions Workflow Enhancements**:
-    *   The `auto-docs.yml` workflow now explicitly includes logic to add and commit changes to `README.md`.
-    *   Added `workflow_dispatch` to `auto-docs.yml`, enabling manual triggering of the workflow directly from the GitHub Actions tab.
-    *   Adjusted workflow conditions to run on both Pull Request merges and manual dispatches.
-*   **Advanced Benchmarking System**: The `tests/benchmark.py` file has been moved to `tests/test_docs/benchmark.py` and significantly upgraded to include:
-    *   **Semantic Recall**: A new, more sophisticated metric for evaluating semantic similarity in model outputs.
-    *   Integration of `numpy` as a dependency for advanced scientific computing within benchmarks.
-    *   Refined dataset handling to support multiple test dataset files.
-*   **Codebase Cleanup**:
-    *   The `generated_docs.md` file has been removed, as the direct output of documentation is now primarily integrated into `README.md` updates.
-    *   The `.gitignore` file has been updated with more precise patterns for ignoring test-related output and dataset files (`tests/test*/dataset_*.py` and `tests/output*`).
+*   **README 자동 업데이트 기능 강화**: 새로운 `ReadmeGenerator` 클래스가 도입되어 `src/main.py`에 통합되었으며, `DocGenerator`의 시스템 프롬프트가 한글 출력을 명시하도록 업데이트되었습니다.
+*   **GitHub Actions 워크플로우 개선**: `auto-docs.yml` 워크플로우가 `README.md` 변경 사항을 자동으로 추가 및 커밋하도록 로직이 강화되었으며, `workflow_dispatch`가 추가되어 GitHub Actions 탭에서 수동 실행이 가능해졌습니다.
+*   **고급 벤치마킹 시스템 도입**: `tests/benchmark.py`가 `tests/test_docs/benchmark.py`로 이동했으며, '의미론적 리콜(Semantic Recall)'이라는 새로운 평가 지표와 `numpy` 의존성이 추가되었습니다. 여러 데이터셋 파일(`dataset_easy.py`, `dataset_normal.py`)을 지원하도록 데이터 처리 방식도 개선되었어요.
+*   **코드베이스 정리**: `generated_docs.md` 파일이 삭제되었고, `.gitignore` 파일도 테스트 관련 출력 및 데이터셋 파일을 더 정확하게 무시하도록 업데이트되었습니다.
