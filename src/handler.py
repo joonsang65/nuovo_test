@@ -63,7 +63,7 @@ class DocGenerator:
                 "usage": {"prompt_tokens": 0, "output_tokens": 0, "total_tokens": 0},
             }
 
-class ReadmeUpdater:
+class ReadmeGenerator:
     def __init__(self):
         load_dotenv()
         self.api_key = os.getenv("GEMINI_API_KEY")
