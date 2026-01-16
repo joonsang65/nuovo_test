@@ -149,7 +149,7 @@ def run_readme_benchmark(test_dataset):
             f"[Missings]: {missing_str}\n"
             f"[Ground Truth]: {ground_truth}\n"
             f"{'-' * 40}\n"
-            f"[Updated README Head]\n{model_output[:300]}...\n" # 너무 기니까 앞부분만 로그에 저장
+            f"[Updated README Head]\n{model_output}...\n"
             f"{'=' * 40}"
         )
         
