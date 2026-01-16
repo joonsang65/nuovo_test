@@ -56,6 +56,7 @@ While the `src/main.py` script is now primarily focused on `README.md` updates, 
 ## Recent Updates
 
 *   **Automated README Generation**: A new `ReadmeGenerator` class has been implemented and integrated into `src/main.py` to automatically update `README.md` based on Git diffs.
+    *   The `DocGenerator`'s system prompt has been updated to explicitly request documentation output in **Korean**.
 *   **GitHub Actions Workflow Enhancements**:
     *   The `auto-docs.yml` workflow now explicitly includes logic to add and commit changes to `README.md`.
     *   Added `workflow_dispatch` to `auto-docs.yml`, enabling manual triggering of the workflow directly from the GitHub Actions tab.
