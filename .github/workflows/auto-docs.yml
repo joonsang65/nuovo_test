@@ -1,4 +1,4 @@
-name: Auto Documentation on Merge
+name: docs.AI (Auto Documentation)
 
 # 조건 : main branch에 PR이 닫히면 실행함
 on:
