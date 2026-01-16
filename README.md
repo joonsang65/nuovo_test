@@ -5,9 +5,10 @@
 ## 주요 기능 (Features)
 
 *   **자동 README 업데이트**: Git Diff를 자동으로 분석하고 Gemini를 활용하여 `README.md` 파일을 최신 개발 내용에 맞춰 업데이트해 줍니다. 덕분에 프로젝트 문서가 항상 최신 상태를 유지할 수 있어요.
-*   **의미론적 리콜 벤치마킹 시스템**: AI 모델의 결과물을 평가하기 위한 고급 시스템으로, 다음 기능들을 포함하고 있습니다:
-    *   **의미론적 리콜 (Semantic Recall)**: 단어 임베딩(word embeddings)과 코사인 유사도(cosine similarity)를 활용하여 모델이 생성한 내용과 실제 정답(ground truth) 간의 의미적 유사도를 측정하는 새로운 평가 지표입니다.
-    *   **향상된 데이터 관리**: 다양한 데이터셋 파일(예: `dataset_easy.py`, `dataset_normal.py`)을 더 유연하게 로드하고 관리할 수 있어 포괄적인 테스트가 가능해졌어요.
+*   **의미론적 리콜 벤치마킹 시스템 (업데이트)**: AI 모델의 결과물을 평가하기 위한 고급 시스템으로, 이제 두 가지 유형의 벤치마크를 제공해요:
+    *   **문서 생성 벤치마크 (`tests/test_docs/benchmark_docs.py`)**: 일반 문서(`DocGenerator`)의 의미론적 리콜을 측정합니다. 모델이 생성한 내용과 실제 정답(ground truth) 간의 의미적 유사도를 측정하는 평가 지표를 사용하며, 이제 **임계값이 0.85로 상향 조정**되어 더 정밀한 평가가 가능해요.
+    *   **README 업데이트 벤치마크 (`tests/test_readme/benchmark_readme.py`)**: `README.md` 파일 업데이트(`ReadmeGenerator`) 전용 벤치마크가 새로 추가되었어요! ✨ 이 시스템은 제공된 Git Diff의 핵심 내용이 업데이트된 README에 잘 반영되었는지 확인하고, 문서의 초기 상태(`current_readme`)를 고려하여 더욱 현실적인 평가를 수행합니다.
+    *   **향상된 데이터 관리**: 다양한 데이터셋 파일(예: `dataset_easy_docs.py`, `dataset_normal_docs.py`, `dataset_readme.py`)을 더 유연하게 로드하고 관리할 수 있어 포괄적인 테스트가 가능해졌어요.
     *   **상세 로깅**: 의미론적 리콜 점수, 실행 시간, 누락된 토큰 목록 등 상세한 벤치마크 결과를 제공하여 더 깊이 있는 분석을 돕습니다.
 *   **유연한 CI/CD 통합**: 문서 및 README 업데이트 워크플로우는 GitHub Actions에 완벽하게 통합되어 다음을 지원합니다:
     *   `main` 브랜치로 Pull Request가 병합될 때마다 자동으로 실행돼요.
@@ -42,20 +43,43 @@
     2.  왼쪽 사이드바에서 "Auto Docs" 워크플로우를 선택합니다.
     3.  일반적으로 `main` 브랜치를 선택한 후 "Run workflow" 버튼을 클릭하여 즉시 업데이트를 시작합니다.
 
-### 벤치마크 실행
+### 벤치마크 실행 🚀
 
-`src/main.py` 스크립트는 이제 주로 `README.md` 업데이트에 초점을 맞추고 있지만, 벤치마크 테스트 자체는 `tests/test_docs/benchmark.py`에 있습니다. 평가 목적으로 이 파일을 직접 실행할 수 있어요.
+이제 두 가지 유형의 벤치마크를 실행할 수 있습니다.
+
+*   **문서 생성 벤치마크 (일반 문서)**: `DocGenerator`의 성능을 평가합니다.
+    ```bash
+    python tests/test_docs/benchmark_docs.py
+    ```
+    실행 시 'easy' 또는 'normal' 모드를 선택하여 해당 데이터셋(`dataset_easy_docs.py`, `dataset_normal_docs.py`)으로 테스트를 진행할 수 있습니다.
+*   **README 업데이트 벤치마크**: `ReadmeGenerator`의 성능을 평가합니다.
+    ```bash
+    python tests/test_readme/benchmark_readme.py
+    ```
+    이 벤치마크는 `tests/test_readme/dataset_readme.py`에 정의된 데이터셋을 사용합니다.
+
+각 벤치마크 실행 후 결과는 해당 테스트 디렉토리 내의 `output_docs/` 또는 `output_readme/` 폴더에 상세 로그 파일로 저장됩니다.
 
 ## 프로젝트 구조 (Project Structure)
 
 *   `src/`: 프로젝트의 핵심 로직을 담고 있습니다.
-    *   `src/handler.py`: `DocGenerator`(일반 문서 생성을 위한 클래스)와 새로 추가된 `ReadmeGenerator` 클래스를 포함합니다.
+    *   `src/handler.py`: `DocGenerator`(일반 문서 생성을 위한 클래스)와 `ReadmeGenerator` 클래스를 포함합니다.
     *   `src/main.py`: 애플리케이션의 주요 진입점으로, 현재 Git Diff를 처리하여 `README.md`를 업데이트하는 데 중점을 둡니다.
-*   `tests/test_docs/`: 이제 벤치마크 테스트들이 이 디렉토리에 있으며, 업데이트된 `benchmark.py`가 포함되어 있습니다.
+*   `tests/test_docs/`: 일반 문서 생성 벤치마크 관련 파일들이 있습니다.
+    *   `benchmark_docs.py`: (이전 `benchmark.py`에서 이름 변경) 문서 생성 AI의 성능을 평가하는 벤치마크 스크립트입니다.
+    *   `dataset_easy_docs.py`, `dataset_normal_docs.py`: (이전 `dataset_easy.py`, `dataset_normal.py`에서 이름 변경) 문서 생성 벤치마크용 데이터셋입니다.
+*   `tests/test_readme/`: **새로 추가된 README 업데이트 벤치마크 관련 파일들이 있습니다.** ✨
+    *   `benchmark_readme.py`: `README.md` 업데이트 AI의 성능을 평가하는 전용 벤치마크 스크립트입니다.
+    *   `dataset_readme.py`: README 업데이트 벤치마크용 데이터셋입니다.
 
 ## 최근 업데이트 (ChangeLog)
 
-*   **README 자동 업데이트 기능 강화**: 새로운 `ReadmeGenerator` 클래스가 도입되어 `src/main.py`에 통합되었으며, `DocGenerator`의 시스템 프롬프트가 한글 출력을 명시하도록 업데이트되었습니다.
+*   **README 자동 업데이트 기능 강화**: 기존 `ReadmeGenerator` 클래스와 `src/main.py` 통합은 동일하며, `DocGenerator` 및 `ReadmeGenerator`의 시스템 프롬프트가 **한글 출력 및 이모지 사용을 명시적으로 권장**하도록 업데이트되었습니다. 🎨
 *   **GitHub Actions 워크플로우 개선**: `auto-docs.yml` 워크플로우가 `README.md` 변경 사항을 자동으로 추가 및 커밋하도록 로직이 강화되었으며, `workflow_dispatch`가 추가되어 GitHub Actions 탭에서 수동 실행이 가능해졌습니다.
-*   **고급 벤치마킹 시스템 도입**: `tests/benchmark.py`가 `tests/test_docs/benchmark.py`로 이동했으며, '의미론적 리콜(Semantic Recall)'이라는 새로운 평가 지표와 `numpy` 의존성이 추가되었습니다. 여러 데이터셋 파일(`dataset_easy.py`, `dataset_normal.py`)을 지원하도록 데이터 처리 방식도 개선되었어요.
-*   **코드베이스 정리**: `generated_docs.md` 파일이 삭제되었고, `.gitignore` 파일도 테스트 관련 출력 및 데이터셋 파일을 더 정확하게 무시하도록 업데이트되었습니다.
+*   **고급 벤치마킹 시스템 대폭 개선**: 이제 두 가지 유형의 벤치마크를 제공해요! 📊
+    *   **기존 문서 생성 벤치마크 리팩토링**: `tests/benchmark.py`가 `tests/test_docs/benchmark_docs.py`로 이름이 변경되었고, '의미론적 리콜(Semantic Recall)'의 **평가 임계값이 0.75에서 0.85로 상향 조정**되어 더욱 엄격한 평가가 가능해졌습니다. `dataset` 파일들도 `dataset_easy_docs.py`, `dataset_normal_docs.py`로 명확하게 이름이 변경되었습니다.
+    *   **새로운 README 업데이트 전용 벤치마크 도입**: `tests/test_readme/` 디렉토리 아래에 `benchmark_readme.py`와 `dataset_readme.py`가 추가되어 `ReadmeGenerator`의 성능을 독립적으로 평가할 수 있게 되었습니다.
+    *   `numpy` 의존성은 기존과 동일하게 유지됩니다.
+*   **프로젝트 구조 및 코드베이스 정리**:
+    *   더 이상 사용되지 않는 `run.py` 파일과 `generated_docs.md` 파일이 삭제되었습니다. 🗑️
+    *   `.gitignore` 파일도 `tests/test*/output*`과 같이 테스트 관련 출력 파일을 더 정확하게 무시하도록 업데이트되었습니다.
