@@ -1,3 +1,8 @@
+안녕하세요! docs.AI 프로젝트에 관심을 가져주셔서 정말 감사해요. 😊
+최근 업데이트된 내용을 반영해서 README.md 파일을 새롭게 단장해 보았습니다.
+
+---
+
 # docs.AI
 
 이 프로젝트는 AI, 특히 Google Gemini를 활용하여 최근 Git 변경사항을 기반으로 프로젝트 문서와 `README.md` 파일을 자동으로 업데이트합니다. 또한 AI 모델의 출력 결과를 평가하기 위한 고급 벤치마킹 시스템도 포함하고 있어요. 정말 똑똑하죠? ✨
@@ -64,15 +69,26 @@
 
 프로젝트의 주요 구성 요소는 다음과 같습니다:
 
-*   `src/`: 프로젝트의 핵심 로직을 담고 있습니다.
-    *   `src/handler.py`: `DocGenerator`(일반 문서 생성을 위한 클래스)와 `ReadmeGenerator` 클래스를 포함합니다.
-    *   `src/main.py`: 애플리케이션의 주요 진입점으로, 현재 Git Diff를 처리하여 `README.md`를 업데이트하는 데 중점을 둡니다.
-*   `tests/test_docs/`: 일반 문서 생성 벤치마크 관련 파일들이 있습니다.
-    *   `benchmark_docs.py`: (이전 `benchmark.py`에서 이름 변경) 문서 생성 AI의 성능을 평가하는 벤치마크 스크립트입니다.
-    *   `dataset_easy_docs.py`, `dataset_normal_docs.py`: (이전 `dataset_easy.py`, `dataset_normal.py`에서 이름 변경) 문서 생성 벤치마크용 데이터셋입니다.
-*   `tests/test_readme/`: **새로 추가된 README 업데이트 벤치마크 관련 파일들이 있습니다.** ✨
-    *   `benchmark_readme.py`: `README.md` 업데이트 AI의 성능을 평가하는 전용 벤치마크 스크립트입니다.
-    *   `dataset_readme.py`: README 업데이트 벤치마크용 데이터셋입니다.
+```
+📂 .github/
+└── 📂 workflows/
+    └── 📄 auto-docs.yml (자동 문서 업데이트 워크플로우)
+📂 src/
+├── 📄 handler.py (DocGenerator와 ReadmeGenerator 클래스 포함)
+└── 📄 main.py (애플리케이션의 주요 진입점)
+📂 tests/
+├── 📂 test_docs/ (일반 문서 생성 벤치마크 관련 파일)
+│   ├── 📄 benchmark_docs.py (문서 생성 AI 성능 평가 스크립트)
+│   ├── 📄 dataset_easy_docs.py (문서 생성 벤치마크용 쉬운 데이터셋)
+│   └── 📄 dataset_normal_docs.py (문서 생성 벤치마크용 일반 데이터셋)
+└── 📂 test_readme/ (README 업데이트 벤치마크 관련 파일)
+    ├── 📄 benchmark_readme.py (README 업데이트 AI 성능 평가 스크립트)
+    └── 📄 dataset_readme.py (README 업데이트 벤치마크용 데이터셋)
+📄 .env.example (환경 변수 예시)
+📄 .gitignore (Git 무시 파일 설정)
+📄 README.md (현재 문서)
+📄 requirements.txt (Python 의존성 목록)
+```
 
 ## 최근 업데이트 (ChangeLog)
 
@@ -84,5 +100,6 @@
     *   **벤치마크 로깅 개선**: `README.md` 업데이트 벤치마크(`tests/test_readme/benchmark_readme.py`)에서 생성된 README의 **전체 내용을 로그에 기록**하도록 변경되어, 모델의 출력 결과를 더욱 상세하게 검토하고 디버깅할 수 있게 되었어요. 📝
     *   `numpy` 의존성은 기존과 동일하게 유지됩니다.
 *   **프로젝트 구조 및 코드베이스 정리**:
+    *   `src/handler.py` 내 `ReadmeUpdater` 클래스가 `ReadmeGenerator`로 이름이 변경되어, 코드베이스의 일관성과 명확성이 향상되었습니다. ✨
     *   더 이상 사용되지 않는 `run.py` 파일과 `generated_docs.md` 파일이 삭제되었습니다. 🗑️
     *   `.gitignore` 파일도 `tests/test*/output*`과 같이 테스트 관련 출력 파일을 더 정확하게 무시하도록 업데이트되었습니다.
