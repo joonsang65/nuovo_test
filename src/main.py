@@ -1,7 +1,8 @@
 # src/main.py
 
 import argparse
-from handler import get_git_diff, DocGenerator
+import os
+from handler import get_git_diff, DocGenerator, ReadmeGenerator 
 
 def main():
     parser = argparse.ArgumentParser()
@@ -11,11 +12,36 @@ def main():
 
     print(f"[*] Diff 추출 중... ({args.base} ... {args.head})")
     diff_content = get_git_diff(args.base, args.head)
-    
-    if len(diff_content) > 10000:
-        print("[!] Diff가 너무 깁니다. 앞부분만 사용합니다.")
-        diff_content = diff_content[:10000]
 
+    print("[*] README 업데이트 중 (GEMINI)...")
+    
+    readme_path = "README.md"
+    current_readme = ""
+    
+    if os.path.exists(readme_path):
+        with open(readme_path, "r", encoding="utf-8") as f:
+            current_readme = f.read()
+    else:
+        print("[!] README.md가 없어 새로 생성합니다.")
+        current_readme = "# New Project"
+
+    updater = ReadmeGenerator()
+    result = updater.update_readme(diff_content, current_readme)
+    
+    if "error" not in result:
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(result["text"])
+        print(f"[SUCCESS] {readme_path} 업데이트 완료")
+        
+        usage = result.get("usage")
+        if usage:
+             print(f"[*] 토큰 사용량: 합계 {usage.get('total_tokens')}")
+    else:
+        print(f"[ERROR] README 업데이트 실패: {result['error']}")
+
+
+    ### docs generator는 일단 주석 처리 해둠
+    """
     print("[*] 문서 생성 중 (GEMINI)...")
     generator = DocGenerator()
     result = generator.generate_docs(diff_content)
@@ -33,6 +59,7 @@ def main():
     
     print("-" * 20)
     print(docs_text)
+    """
 
 if __name__ == "__main__":
     main()

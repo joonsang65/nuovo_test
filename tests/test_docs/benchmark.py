@@ -1,4 +1,4 @@
-# tests/benchmark.py
+# tests/test_docs/benchmark.py
 
 import time
 import os
@@ -110,7 +110,7 @@ def run_benchmark(test_dataset):
         print(f"Generator 초기화 실패: {e}")
         return
 
-    output_dir = os.path.join(os.path.dirname(__file__), 'output')
+    output_dir = os.path.join(os.path.dirname(__file__), 'output_docs')
     os.makedirs(output_dir, exist_ok=True)
 
     total_time = 0.0

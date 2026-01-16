@@ -7,12 +7,16 @@ on:
     branches:
       - main
 
+  # 혹은 Actions 탭에서 버튼 클릭으로 실행
+  workflow_dispatch:
+
 # 실행 task
 jobs:
   generate-docs:
-    # PR이 닫힌 게 merge 되어서 닫힌 것만 실행함
-    if: github.event.pull_request.merged == true
+    # PR이 Merge 되었거나, 수동 실행일 때만 진행
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    
     # 권한 부여
     permissions:
       contents: write
@@ -31,35 +35,40 @@ jobs:
           python-version: '3.11'
           cache: 'pip'  # 의존성 캐싱
 
-      # 의존성 설치    
+      # 의존성 설치
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 변경사항 docs 생성
-      - name: Generate Documentation
+      # main 함수 실행 (주석 처리에 따라 docs or readme 업데이트)
+      - name: Run AutoDocs
         env:
-          # secrets에 넣어둔 api 키 주입
+          # api 키 주입
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        # 조건에 따라 수행
         run: |
-          python src/main.py --base ${{ github.event.pull_request.base.sha }} --head ${{ github.event.pull_request.head.sha }}
-
-      # 디버깅용 아티팩트 저장
-      - name: Upload Docs as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: auto-generated-docs
-          path: generated_docs.md
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA=${{ github.event.pull_request.base.sha }}
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+            echo "PR Detected: Diff from $BASE_SHA to $HEAD_SHA"
+            python src/main.py --base $BASE_SHA --head $HEAD_SHA
+          
+          else
+            echo "Manual Run: Checking latest commit"
+            python src/main.py
+          fi
 
       # 레포에 docs 저장 (변경 사항 있을 때만 commit)
-      - name: Commit and Push Docs
+      - name: Commit and Push Changes
         run: |
           git config --global user.name 'Docs Bot'
           git config --global user.email 'bot@noreply.github.com'
-          git add generated_docs.md
+          
+          git add README.md generated_docs.md || true
+          
           if ! git diff --staged --quiet; then
-            git commit -m "docs: Update documentation for PR #${{ github.event.pull_request.number }}"
+            git commit -m "docs: Update documentation & README automatically"
             git push
           else
             echo "변경 사항 없음"
