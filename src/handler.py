@@ -1,12 +1,14 @@
 # src/handler.py
 
-import subprocess
-import sys
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+
+import subprocess
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from config import Config
+from src.config import Config
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
     try:

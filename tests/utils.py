@@ -2,12 +2,11 @@
 
 import re
 import numpy as np
+from src.config import Config
 
 # -------------------------
 #   CONFIG
 # -------------------------
-
-THRESHOLD = 0.85
 
 STOP_WORDS = {
     'the', 'a', 'an', 'is', 'are', 'was', 'were', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 
@@ -51,7 +50,7 @@ def compute_max_similarity(target_vec, comparison_vectors):
     similarities = np.divide(dot_products, norms, out=np.zeros_like(dot_products), where=norms!=0)
     return np.max(similarities)
 
-def calculate_semantic_recall(client, ground_truth, model_output, threshold=THRESHOLD):
+def calculate_semantic_recall(client, ground_truth, model_output, threshold=Config.SEMANTIC_RECALL_THRESHOLD):
     """
     Ground Truth(핵심 내용)가 Model Output에 포함되었는지 검사
     """
