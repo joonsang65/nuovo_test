@@ -4,7 +4,8 @@ class Config:
     GENERATION_MODEL = "gemini-2.5-flash"
     TEMPERATURE_DOCS = 0.2
     TEMPERATURE_README = 0.4
-    
+    SEMANTIC_RECALL_THRESHOLD = 0.9
+
     # System Prompts
     PROMPT_DOCS_SYSTEM = """
     당신은 수석 테크니컬 라이터입니다. 

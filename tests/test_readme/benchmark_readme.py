@@ -7,8 +7,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from src.handler import ReadmeUpdater
+from src.handler import ReadmeGenerator
 from src.config import Config
 from utils import calculate_semantic_recall
 import dataset_readme
@@ -19,7 +20,7 @@ def run_readme_benchmark(test_dataset):
     print("=== README 벤치마크 시작 ===")
     
     try:
-        updater = ReadmeUpdater()
+        updater = ReadmeGenerator()
         client = updater.client
     except Exception as e:
         print(f"Updater 초기화 실패: {e}")
@@ -68,7 +69,7 @@ def run_readme_benchmark(test_dataset):
             f"[Missings]: {missing_str}\n"
             f"[Ground Truth]: {ground_truth}\n"
             f"{'-' * 40}\n"
-            f"[Updated README Head]\n{model_output[:300]}...\n"
+            f"[Updated README Head]\n{model_output}...\n"
             f"{'=' * 40}"
         )
         

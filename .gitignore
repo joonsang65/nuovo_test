@@ -7,3 +7,4 @@ tests/__pycache__/
 tests/*.log
 tests/test*/dataset_*.py
 tests/test*/output*
+local_model
