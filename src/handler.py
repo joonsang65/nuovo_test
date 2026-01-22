@@ -8,7 +8,7 @@ import subprocess
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from src.config import Config
+from config import Config
 
 def get_git_diff(base_ref: str = "HEAD^", head_ref: str = "HEAD") -> str:
     try:
